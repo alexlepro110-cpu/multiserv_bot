@@ -1,29 +1,27 @@
-const dns = require('dns');
-const net = require('net');
+const { createClient } = require('bedrock-protocol');
 
-// Test DNS d'abord
-dns.lookup('147.185.221.17:12971', (err, ip) => {
-  if (err) {
-    console.log('❌ DNS ERROR:', err.message);
-    return;
-  }
-  console.log('✅ DNS résolu:', ip);
- 
-  // Test TCP ensuite
-  const socket = net.createConnection(19132, ip);
-  socket.setTimeout(5000);
- 
-  socket.on('connect', () => {
-    console.log('✅ PORT OUVERT !');
-    socket.destroy();
-  });
- 
-  socket.on('timeout', () => {
-    console.log('❌ PORT TIMEOUT');
-    socket.destroy();
-  });
- 
-  socket.on('error', (err) => {
-    console.log('❌ PORT ERROR:', err.message);
-  });
+// METS LES INFOS DE PLAYIT ICI
+const SERVEUR_IP = '147.185.221.17';    // L'IP donnée par playit
+const PORT = 12971;                     // Le PORT donnée par playit
+const NOM_BOT = 'MultiservBot';
+
+console.log(`🚀 Connexion à ${SERVEUR_IP}:${PORT} via playit...`);
+
+const client = createClient({
+  host: SERVEUR_IP,
+  port: PORT,  // ← Utilise le port playit, PAS 19132
+  username: NOM_BOT,
+  offline: true
+});
+
+client.on('connect', () => {
+  console.log('✅ Bot connecté via playit !');
+});
+
+client.on('friendRequest', (player) => {
+  client.acceptFriendRequest(player);
+});
+
+client.on('error', (err) => {
+  console.log('❌', err.message);
 }); 
