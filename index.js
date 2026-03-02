@@ -1,28 +1,29 @@
-const { createClient } = require('bedrock-protocol');
+const dns = require('dns');
+const net = require('net');
 
-// METS TA VRAIE IP ICI
-const SERVEUR_IP = 'listings-newport.gl.at.ply.gg';  // Test avec Lifeboat d'abord
-const PORT = 12971;
-const NOM_BOT = 'MultiservBot';
-
-console.log(`?? Tentative de connexion � ${SERVEUR_IP}:${PORT}...`);
-
-const client = createClient({
-  host: SERVEUR_IP,
-  port: PORT,
-  username: NOM_BOT,
-  offline: true,
-  connectTimeout: 10000  // Attend 10 secondes max
-});
-
-client.on('connect', () => {
-  console.log('? Connect� !');
-});
-
-client.on('error', (err) => {
-  console.log('? Erreur:', err.message);
-});
-
-setTimeout(() => {
-  console.log('?? Timeout - Le serveur ne r�pond pas');
-}, 15000); 
+// Test DNS d'abord
+dns.lookup('listings-newport.gl.at.ply.gg:12971', (err, ip) => {
+  if (err) {
+    console.log('❌ DNS ERROR:', err.message);
+    return;
+  }
+  console.log('✅ DNS résolu:', ip);
+ 
+  // Test TCP ensuite
+  const socket = net.createConnection(19132, ip);
+  socket.setTimeout(5000);
+ 
+  socket.on('connect', () => {
+    console.log('✅ PORT OUVERT !');
+    socket.destroy();
+  });
+ 
+  socket.on('timeout', () => {
+    console.log('❌ PORT TIMEOUT');
+    socket.destroy();
+  });
+ 
+  socket.on('error', (err) => {
+    console.log('❌ PORT ERROR:', err.message);
+  });
+}); 
