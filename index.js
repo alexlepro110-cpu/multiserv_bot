@@ -2,7 +2,7 @@ const dns = require('dns');
 const net = require('net');
 
 // Test DNS d'abord
-dns.lookup('listings-newport.gl.at.ply.gg:12971', (err, ip) => {
+dns.lookup('147.185.221.17:12971', (err, ip) => {
   if (err) {
     console.log('❌ DNS ERROR:', err.message);
     return;
